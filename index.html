@@ -415,12 +415,12 @@
       return (
         <div className="min-h-screen pb-10 fade-in">
           {/* 導航列 */}
-          <nav className="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center sticky top-0 z-20">
-            <h1 className="text-xl font-bold text-gray-700 flex items-center gap-2">
+          <nav className="bg-white shadow-sm border-b px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0 sticky top-0 z-20">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-700 flex items-center gap-2">
               <span className="bg-[#6b584b] text-white px-2 py-1 rounded text-sm">陳佳苑裡</span>
               報價單管理系統
             </h1>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto justify-center">
               <button
                 onClick={() => setActiveTab('settings')}
                 className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-md transition-colors ${activeTab === 'settings' ? 'bg-[#6b584b] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
@@ -493,9 +493,9 @@
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-gray-50 text-gray-600 text-sm">
-                          <th className="p-3 border-b">基礎定價 (台幣 TWD)</th>
-                          <th className="p-3 border-b">自動換算金額</th>
-                          <th className="p-3 border-b bg-orange-50 text-orange-800">手動覆蓋外幣價格 (留空則使用自動計算)</th>
+                          <th className="p-3 border-b whitespace-nowrap">基礎定價 (台幣 TWD)</th>
+                          <th className="p-3 border-b whitespace-nowrap">自動換算金額</th>
+                          <th className="p-3 border-b bg-orange-50 text-orange-800 whitespace-nowrap">手動覆蓋外幣價格 (留空則使用自動計算)</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -539,10 +539,10 @@
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-gray-50 text-gray-600 text-sm">
-                          <th className="p-3 border-b">房間</th>
-                          <th className="p-3 border-b bg-blue-50/50">基礎定價 (台幣 TWD)</th>
-                          <th className="p-3 border-b bg-orange-50/30">人民幣 (RMB) 定價</th>
-                          <th className="p-3 border-b bg-orange-50/30">美金 (USD) 定價</th>
+                          <th className="p-3 border-b whitespace-nowrap">房間</th>
+                          <th className="p-3 border-b bg-blue-50/50 whitespace-nowrap">基礎定價 (台幣 TWD)</th>
+                          <th className="p-3 border-b bg-orange-50/30 whitespace-nowrap">人民幣 (RMB) 定價</th>
+                          <th className="p-3 border-b bg-orange-50/30 whitespace-nowrap">美金 (USD) 定價</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -765,88 +765,88 @@
                     )}
                     
                     {/* 內部米色區塊 (懸浮卡片) */}
-                    <div className="pt-8 px-6 sm:px-10 pb-28 relative z-10">
-                      <div className="bg-[#f2eee8] rounded-[2rem] shadow-xl relative overflow-hidden">
+                    <div className="pt-6 sm:pt-8 px-4 sm:px-10 pb-20 sm:pb-28 relative z-10">
+                      <div className="bg-[#f2eee8] rounded-[1.5rem] sm:rounded-[2rem] shadow-xl relative overflow-hidden">
                         
                         {/* 米色卡片內的裝飾網點 */}
                         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#6b584b 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
                         
-                        <div className="relative p-8 sm:p-10 text-[#5c4a40]">
+                        <div className="relative p-5 sm:p-10 text-[#5c4a40]">
                           
                           {/* 標題 */}
-                          <div className="mb-8">
-                            <h1 className="text-3xl font-extrabold mb-3 tracking-wide">{t.title}</h1>
-                            <p className="text-sm opacity-80 font-medium">{t.subtitle}</p>
+                          <div className="mb-5 sm:mb-8">
+                            <h1 className="text-2xl sm:text-3xl font-extrabold mb-2 sm:mb-3 tracking-wide">{t.title}</h1>
+                            <p className="text-[10px] sm:text-sm opacity-80 font-medium">{t.subtitle}</p>
                           </div>
 
                           {/* 表格 */}
-                          <div className="mb-8">
+                          <div className="mb-6 sm:mb-8">
                             {/* 調整欄位比例：位置(2), 房間(3), 簡介(4), 價格(3) */}
-                            <div className="grid grid-cols-12 border-b border-[#5c4a40]/20 pb-3 mb-4 text-sm font-bold opacity-80">
-                              <div className="col-span-2 text-left pr-2">{t.headerLoc}</div>
-                              <div className="col-span-3 pr-2">{t.headerRoom}</div>
-                              <div className="col-span-4 pr-2">{t.headerType}</div>
+                            <div className="grid grid-cols-12 border-b border-[#5c4a40]/20 pb-2 sm:pb-3 mb-3 sm:mb-4 text-[11px] sm:text-sm font-bold opacity-80">
+                              <div className="col-span-2 text-left pr-1 sm:pr-2">{t.headerLoc}</div>
+                              <div className="col-span-3 pr-1 sm:pr-2">{t.headerRoom}</div>
+                              <div className="col-span-4 pr-1 sm:pr-2">{t.headerType}</div>
                               <div className="col-span-3 text-right whitespace-nowrap">
                                 {t.headerPrice}
-                                {previewCurrency === 'CNY' && <span className="text-[11px] font-normal opacity-80 tracking-normal ml-0.5">(人民币)</span>}
-                                {previewCurrency === 'USD' && <span className="text-[11px] font-normal opacity-80 tracking-normal ml-0.5">(USD)</span>}
+                                {previewCurrency === 'CNY' && <span className="text-[9px] sm:text-[11px] font-normal opacity-80 tracking-normal ml-0.5">(人民币)</span>}
+                                {previewCurrency === 'USD' && <span className="text-[9px] sm:text-[11px] font-normal opacity-80 tracking-normal ml-0.5">(USD)</span>}
                               </div>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                               {/* 古厝 */}
                               <div className="grid grid-cols-12 items-center relative">
-                                <div className="col-span-2 text-left font-bold opacity-80 pr-2 leading-snug">{t.locOld}</div>
-                                <div className="col-span-10 space-y-4">
+                                <div className="col-span-2 text-left font-bold opacity-80 pr-1 sm:pr-2 leading-snug text-[12px] sm:text-base">{t.locOld}</div>
+                                <div className="col-span-10 space-y-3 sm:space-y-4">
                                   {ROOMS_DATA.filter(r => r.loc === 'old').map(room => (
                                     <div key={room.id} className="grid grid-cols-10 items-center">
-                                      <div className="col-span-3 font-medium text-[15px] pr-2 relative">
+                                      <div className="col-span-3 font-medium text-[11px] sm:text-[15px] pr-1 sm:pr-2 relative">
                                         {room.name[previewLang].startsWith('*') ? (
                                           <>
-                                            <span className="absolute -left-3.5 opacity-80">*</span>
+                                            <span className="absolute -left-2.5 sm:-left-3.5 opacity-80">*</span>
                                             {room.name[previewLang].replace(/^\*\s*/, '')}
                                           </>
                                         ) : (
                                           room.name[previewLang]
                                         )}
                                       </div>
-                                      <div className="col-span-4 text-sm opacity-90 pr-2">{room.desc[previewLang]}</div>
-                                      <div className="col-span-3 text-right font-bold text-lg whitespace-nowrap">{getFinalRoomPrice(room)}</div>
+                                      <div className="col-span-4 text-[10px] sm:text-sm opacity-90 pr-1 sm:pr-2 leading-snug">{room.desc[previewLang]}</div>
+                                      <div className="col-span-3 text-right font-bold text-[13px] sm:text-lg whitespace-nowrap">{getFinalRoomPrice(room)}</div>
                                     </div>
                                   ))}
                                 </div>
                               </div>
                               
-                              <div className="border-t border-dashed border-[#5c4a40]/30 my-6"></div>
+                              <div className="border-t border-dashed border-[#5c4a40]/30 my-4 sm:my-6"></div>
                               
                               {/* 新居 */}
                               <div className="grid grid-cols-12 items-center">
-                                <div className="col-span-2 text-left font-bold opacity-80 pr-2 leading-snug">{t.locNew}</div>
-                                <div className="col-span-10 space-y-4">
+                                <div className="col-span-2 text-left font-bold opacity-80 pr-1 sm:pr-2 leading-snug text-[12px] sm:text-base">{t.locNew}</div>
+                                <div className="col-span-10 space-y-3 sm:space-y-4">
                                   {ROOMS_DATA.filter(r => r.loc === 'new').map(room => (
                                     <div key={room.id} className="grid grid-cols-10 items-center">
-                                      <div className="col-span-3 font-medium text-[15px] pr-2 relative">
+                                      <div className="col-span-3 font-medium text-[11px] sm:text-[15px] pr-1 sm:pr-2 relative">
                                         {room.name[previewLang].startsWith('*') ? (
                                           <>
-                                            <span className="absolute -left-3.5 opacity-80">*</span>
+                                            <span className="absolute -left-2.5 sm:-left-3.5 opacity-80">*</span>
                                             {room.name[previewLang].replace(/^\*\s*/, '')}
                                           </>
                                         ) : (
                                           room.name[previewLang]
                                         )}
                                       </div>
-                                      <div className="col-span-4 text-sm opacity-90 pr-2">{room.desc[previewLang]}</div>
-                                      <div className="col-span-3 text-right font-bold text-lg whitespace-nowrap">{getFinalRoomPrice(room)}</div>
+                                      <div className="col-span-4 text-[10px] sm:text-sm opacity-90 pr-1 sm:pr-2 leading-snug">{room.desc[previewLang]}</div>
+                                      <div className="col-span-3 text-right font-bold text-[13px] sm:text-lg whitespace-nowrap">{getFinalRoomPrice(room)}</div>
                                     </div>
                                   ))}
                                 </div>
                               </div>
                             </div>
-                            <div className="border-b border-[#5c4a40]/20 mt-6 mb-6"></div>
+                            <div className="border-b border-[#5c4a40]/20 mt-4 sm:mt-6 mb-4 sm:mb-6"></div>
                           </div>
 
                           {/* 備註區 (動態渲染) */}
-                          <div className="text-[13px] space-y-3 opacity-80 leading-relaxed font-medium">
+                          <div className="text-[10px] sm:text-[13px] space-y-2 sm:space-y-3 opacity-80 leading-relaxed font-medium">
                             {notes[previewLang].map((note, idx) => renderNoteWithVariable(note, idx))}
                           </div>
                         </div>
@@ -854,20 +854,20 @@
                     </div>
 
                     {/* 底部 Logo (直接疊加在外圍底圖上，如同原版海報) */}
-                    <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-3 text-white z-20 drop-shadow-md">
+                    <div className="absolute bottom-4 sm:bottom-8 left-0 right-0 flex items-center justify-center gap-2 sm:gap-3 text-white z-20 drop-shadow-md">
                       {customLogo && !logoError ? (
-                        <img src={customLogo} alt="Logo" className="max-h-12 w-auto object-contain" onError={() => setLogoError(true)} />
+                        <img src={customLogo} alt="Logo" className="max-h-8 sm:max-h-12 w-auto object-contain" onError={() => setLogoError(true)} />
                       ) : (
-                        <div className="w-10 h-10 border-2 border-white rounded-md flex items-center justify-center relative bg-[#524237]">
-                          <div className="absolute top-1 w-4 h-1 bg-white"></div>
-                          <div className="absolute bottom-2 w-6 h-3 border border-white"></div>
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 border-2 border-white rounded-md flex items-center justify-center relative bg-[#524237]">
+                          <div className="absolute top-1 w-3 sm:w-4 h-1 bg-white"></div>
+                          <div className="absolute bottom-2 w-5 sm:w-6 h-2 sm:h-3 border border-white"></div>
                         </div>
                       )}
-                      <div className="font-bold text-2xl tracking-widest">陳佳苑裡 <span className="text-[10px] uppercase font-normal tracking-normal opacity-80">Kinmen</span></div>
+                      <div className="font-bold text-lg sm:text-2xl tracking-widest">陳佳苑裡 <span className="text-[8px] sm:text-[10px] uppercase font-normal tracking-normal opacity-80">Kinmen</span></div>
                     </div>
 
                     {/* 右下角時間戳記 */}
-                    <div className="absolute bottom-3 right-5 z-20 text-[11px] text-white/70 tracking-wider">
+                    <div className="absolute bottom-2 sm:bottom-3 right-3 sm:right-5 z-20 text-[9px] sm:text-[11px] text-white/70 tracking-wider">
                       {previewLang === 'en' ? `Updated ${updateDate}` : `${updateDate} ${t.updated}`}
                     </div>
 
