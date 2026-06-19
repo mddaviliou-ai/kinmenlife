@@ -107,16 +107,19 @@
         title: '民宿房價表', subtitle: '（附早餐、電動車體驗、機場/碼頭接送、代租車、寄放行李服務）',
         headerLoc: '位置', headerRoom: '房間', headerType: '房型簡介', headerPrice: '每晚房價',
         locOld: '古厝', locNew: '新居',
+        updated: '更新'
       },
       'zh-CN': {
         title: '民宿房价表', subtitle: '（附早餐、电动车体验、机场/码头接送、代租车、寄放行李服务）',
         headerLoc: '位置', headerRoom: '房间', headerType: '房型简介', headerPrice: '每晚房价',
         locOld: '古厝', locNew: '新居',
+        updated: '更新'
       },
       'en': {
         title: 'Homestay Room Rates', subtitle: '(Includes breakfast, e-bike experience, airport/pier transfer, car rental, luggage storage)',
         headerLoc: 'Location', headerRoom: 'Room', headerType: 'Description', headerPrice: 'Rate / Night',
         locOld: 'Fujian-style old house', locNew: 'New House',
+        updated: 'Updated'
       }
     };
 
@@ -173,6 +176,9 @@
       // 6. 背景圖片設定
       const [customBg, setCustomBg] = useLocalStorage('customBg', null);
 
+      // 7. 更新日期設定
+      const [updateDate, setUpdateDate] = useLocalStorage('updateDate', '2026/06/19');
+
       // --- Firebase 雲端讀取與儲存狀態 ---
       const [isSaving, setIsSaving] = useState(false);
       const [isLoaded, setIsLoaded] = useState(false);
@@ -193,6 +199,7 @@
               if (data.customPricesCny) setCustomPricesCny(data.customPricesCny);
               if (data.customPricesUsd) setCustomPricesUsd(data.customPricesUsd);
               if (data.notes) setNotes(data.notes);
+              if (data.updateDate) setUpdateDate(data.updateDate);
             }
           } catch (error) {
             console.error("讀取雲端資料庫失敗：", error);
@@ -232,6 +239,7 @@
             customPricesCny,
             customPricesUsd,
             notes,
+            updateDate,
             lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
           alert("✅ 儲存成功！您的設定已同步至 Firebase 雲端。\n未來在此網域開啟網頁時，將自動讀取這份最新資料。");
@@ -692,6 +700,21 @@
                   </div>
                 </div>
 
+                {/* 7. 更新日期設定 */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                  <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">7. 更新日期標示設定</h2>
+                  <div className="flex items-center gap-4">
+                    <label className="text-sm font-medium text-gray-700">顯示於報價單右下角的日期：</label>
+                    <input
+                      type="date"
+                      value={updateDate.replace(/\//g, '-')}
+                      onChange={(e) => setUpdateDate(e.target.value.replace(/-/g, '/'))}
+                      className="border border-gray-300 rounded px-3 py-2 w-48 focus:ring-2 focus:ring-[#6b584b] outline-none cursor-pointer"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2">提示：將會自動在中文版顯示「{updateDate} 更新」，在英文版顯示「Updated {updateDate}」。</p>
+                </div>
+
               </div>
             )}
 
@@ -839,6 +862,11 @@
                         </div>
                       )}
                       <div className="font-bold text-2xl tracking-widest">陳佳苑裡 <span className="text-[10px] uppercase font-normal tracking-normal opacity-80">Kinmen</span></div>
+                    </div>
+
+                    {/* 右下角時間戳記 */}
+                    <div className="absolute bottom-3 right-5 z-20 text-[11px] text-white/70 tracking-wider">
+                      {previewLang === 'en' ? `Updated ${updateDate}` : `${updateDate} ${t.updated}`}
                     </div>
 
                   </div>
