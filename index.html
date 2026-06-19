@@ -191,14 +191,15 @@
     };
 
     function App() {
-      // --- 登入狀態管理 ---
-      const [isLoggedIn, setIsLoggedIn] = useLocalStorage('isLoggedIn', false);
-      const [loginUser, setLoginUser] = useState('');
-      const [loginPass, setLoginPass] = useState('');
+      // --- 狀態管理 ---
+      // 預設進入網頁顯示「預覽報價單」
+      const [activeTab, setActiveTab] = useState('preview'); 
+      
+      // 登入狀態與密碼設定
+      const [isSettingsUnlocked, setIsSettingsUnlocked] = useLocalStorage('isSettingsUnlocked', false);
+      const [inputPass, setInputPass] = useState('');
       const [loginError, setLoginError] = useState(false);
-
-      // --- 其他狀態管理 ---
-      const [activeTab, setActiveTab] = useState('settings'); 
+      const [settingsPassword, setSettingsPassword] = useLocalStorage('settingsPassword', '1217');
       
       // 1. 匯率設定
       const [rates, setRates] = useLocalStorage('rates', { cnyToTwd: 4.45, usdToTwd: 32.0 });
@@ -239,10 +240,8 @@
       const [isSaving, setIsSaving] = useState(false);
       const [isLoaded, setIsLoaded] = useState(false);
 
-      // 網頁開啟且已登入時，自動從 Firebase 讀取最新設定
+      // 網頁開啟時，自動從 Firebase 讀取最新設定 (無須登入即可讀取以顯示給客人)
       useEffect(() => {
-        if (!isLoggedIn) return; // 未登入不讀取
-        
         const loadDataFromCloud = async () => {
           try {
             const docRef = await db.collection('adminSettings').doc('pricingData').get();
@@ -258,6 +257,7 @@
               if (data.notes) setNotes(data.notes);
               if (data.updateDate) setUpdateDate(data.updateDate);
               if (data.noteLineSpacing) setNoteLineSpacing(data.noteLineSpacing);
+              if (data.settingsPassword) setSettingsPassword(data.settingsPassword);
               
               // 載入同步的圖片 (如果雲端有資料的話)
               if (data.customLogo !== undefined) setCustomLogo(data.customLogo);
@@ -270,23 +270,23 @@
           }
         };
         loadDataFromCloud();
-      }, [isLoggedIn]);
+      }, []); // 空陣列確保只在載入時執行一次
 
       // --- 登入與登出邏輯 ---
       const handleLogin = (e) => {
         e.preventDefault();
-        if (loginUser === 'o0925171' && loginPass === '0925') {
-          setIsLoggedIn(true);
+        if (inputPass === settingsPassword) {
+          setIsSettingsUnlocked(true);
           setLoginError(false);
+          setInputPass('');
         } else {
           setLoginError(true);
         }
       };
 
       const handleLogout = () => {
-        setIsLoggedIn(false);
-        setLoginUser('');
-        setLoginPass('');
+        setIsSettingsUnlocked(false);
+        setActiveTab('preview');
       };
 
       // 手動將當前設定儲存至雲端功能
@@ -304,6 +304,7 @@
             notes,
             updateDate,
             noteLineSpacing,
+            settingsPassword,
             customLogo, // 上傳已壓縮的 Logo
             customBg,   // 上傳已壓縮的 Background
             lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
@@ -463,63 +464,6 @@
 
       const t = STATIC_TRANSLATIONS[previewLang];
 
-      // --- 若未登入，顯示登入畫面 ---
-      if (!isLoggedIn) {
-        return (
-          <div className="min-h-screen flex items-center justify-center bg-gray-50 pb-10 p-4">
-            <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 fade-in">
-              <div className="text-center mb-8">
-                <div className="w-14 h-14 bg-[#6b584b] rounded-2xl mx-auto flex items-center justify-center mb-5 shadow-lg shadow-[#6b584b]/30">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
-                </div>
-                <h1 className="text-2xl font-bold text-gray-800 tracking-wide">陳佳苑裡<br/><span className="text-xl">報價系統登入</span></h1>
-                <p className="text-gray-500 mt-2 text-sm font-medium">請輸入您的管理員帳號與密碼</p>
-              </div>
-              
-              <form onSubmit={handleLogin} className="space-y-5">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1.5">帳號</label>
-                  <input 
-                    type="text" 
-                    value={loginUser} 
-                    onChange={e => setLoginUser(e.target.value)} 
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#6b584b] focus:border-[#6b584b] outline-none transition-shadow bg-gray-50 focus:bg-white" 
-                    placeholder="請輸入帳號" 
-                    required 
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1.5">密碼</label>
-                  <input 
-                    type="password" 
-                    value={loginPass} 
-                    onChange={e => setLoginPass(e.target.value)} 
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#6b584b] focus:border-[#6b584b] outline-none transition-shadow bg-gray-50 focus:bg-white" 
-                    placeholder="請輸入密碼" 
-                    required 
-                  />
-                </div>
-                
-                {loginError && (
-                  <div className="bg-red-50 text-red-600 text-sm font-bold p-3 rounded-lg flex items-center gap-2">
-                    <IconInfo />
-                    帳號或密碼錯誤，請重新確認。
-                  </div>
-                )}
-                
-                <button type="submit" className="w-full bg-[#6b584b] hover:bg-[#524237] text-white font-bold py-3.5 rounded-xl transition-colors shadow-md mt-2 flex justify-center items-center gap-2 text-lg">
-                  登入系統
-                </button>
-              </form>
-            </div>
-          </div>
-        );
-      }
-
-      // --- 登入成功後顯示系統主畫面 ---
       return (
         <div className="min-h-screen pb-10 fade-in">
           {/* 導航列 */}
@@ -530,33 +474,76 @@
             </h1>
             <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto justify-center">
               <button
-                onClick={() => setActiveTab('settings')}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-md transition-colors ${activeTab === 'settings' ? 'bg-[#6b584b] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
-              >
-                <IconSettings /> <span className="hidden sm:inline">價格與備註設定</span>
-              </button>
-              <button
                 onClick={() => setActiveTab('preview')}
                 className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-md transition-colors ${activeTab === 'preview' ? 'bg-[#6b584b] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
               >
                 <IconFileText /> <span className="hidden sm:inline">報價單預覽</span>
               </button>
-              {/* 登出按鈕 */}
-              <div className="w-px h-6 bg-gray-300 mx-2"></div>
               <button
-                onClick={handleLogout}
-                className="flex items-center gap-1.5 px-3 py-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors font-medium text-sm"
-                title="登出系統"
+                onClick={() => setActiveTab('settings')}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-md transition-colors ${activeTab === 'settings' ? 'bg-[#6b584b] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
               >
-                <IconLogOut /> <span className="hidden sm:inline">登出</span>
+                <IconSettings /> <span className="hidden sm:inline">價格與備註設定</span>
               </button>
+              {/* 登出按鈕 */}
+              {isSettingsUnlocked && (
+                <Fragment>
+                  <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-1.5 px-3 py-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors font-medium text-sm"
+                    title="鎖定設定"
+                  >
+                    <IconLogOut /> <span className="hidden sm:inline">鎖定</span>
+                  </button>
+                </Fragment>
+              )}
             </div>
           </nav>
 
           <main className="p-6 max-w-5xl mx-auto">
             
+            {/* ================= 未解鎖時的登入畫面 (點擊設定才會看到) ================= */}
+            {activeTab === 'settings' && !isSettingsUnlocked && (
+              <div className="flex items-center justify-center py-10">
+                <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 fade-in w-full max-w-sm">
+                  <div className="text-center mb-6">
+                    <div className="w-12 h-12 bg-[#6b584b] rounded-xl mx-auto flex items-center justify-center mb-4 shadow-md shadow-[#6b584b]/30">
+                      <IconSettings stroke="white" />
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-800">管理員驗證</h2>
+                    <p className="text-gray-500 mt-2 text-sm font-medium">請輸入系統密碼以進入設定頁面</p>
+                  </div>
+                  
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    <div>
+                      <input 
+                        type="password" 
+                        value={inputPass} 
+                        onChange={e => setInputPass(e.target.value)} 
+                        className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#6b584b] focus:border-[#6b584b] outline-none transition-shadow bg-gray-50 focus:bg-white text-center tracking-widest text-lg" 
+                        placeholder="請輸入密碼" 
+                        required 
+                      />
+                    </div>
+                    
+                    {loginError && (
+                      <div className="bg-red-50 text-red-600 text-sm font-bold p-3 rounded-lg flex items-center justify-center gap-2">
+                        <IconInfo />
+                        密碼錯誤，請重新確認
+                      </div>
+                    )}
+                    
+                    <button type="submit" className="w-full bg-[#6b584b] hover:bg-[#524237] text-white font-bold py-3 rounded-xl transition-colors shadow-md mt-2 flex justify-center items-center gap-2">
+                      驗證並進入
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+
             {/* ================= 設定頁面 ================= */}
-            {activeTab === 'settings' && (
+            {activeTab === 'settings' && isSettingsUnlocked && (
               <div className="space-y-6 fade-in">
                 
                 {/* 雲端儲存控制面板 */}
@@ -847,6 +834,22 @@
                     />
                   </div>
                   <p className="text-xs text-gray-400 mt-2">提示：將會自動在中文版顯示「{updateDate} 更新」，在英文版顯示「Updated {updateDate}」。</p>
+                </div>
+                
+                {/* 8. 系統密碼設定 */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                  <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">8. 系統設定密碼更改</h2>
+                  <div className="flex items-center gap-4">
+                    <label className="text-sm font-medium text-gray-700">新密碼：</label>
+                    <input
+                      type="text"
+                      value={settingsPassword}
+                      onChange={(e) => setSettingsPassword(e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-2 w-48 focus:ring-2 focus:ring-[#6b584b] outline-none"
+                      placeholder="請輸入新密碼"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2">提示：更改後請點擊上方「儲存設定至雲端」，下次進入設定頁面需輸入此新密碼。</p>
                 </div>
 
               </div>
