@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>陳佳苑裡 - 民宿報價管理系統</title>
   
+  <!-- SEO 與社群分享標籤 (Open Graph) -->
+  <meta name="description" content="金門陳佳苑裡民宿線上價目表" />
+  <meta property="og:title" content="陳佳苑裡 - 民宿報價單" />
+  <meta property="og:description" content="金門陳佳苑裡民宿線上價目表" />
+  <meta property="og:image" content="logo3.png" />
+  <meta property="og:type" content="website" />
+  
   <!-- 網頁標籤 (Favicon) 讀取 logo3.png -->
   <link rel="icon" href="logo3.png" type="image/png" />
 
@@ -847,31 +854,35 @@
             {/* ================= 預覽頁面 ================= */}
             {activeTab === 'preview' && (
               <div className="space-y-6 fade-in">
-                {/* 預覽控制器 */}
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-wrap gap-6 items-center justify-between">
-                  <div className="flex gap-4 items-center">
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm font-bold text-gray-700">選擇顯示語系：</label>
+                {/* 預覽控制器 (手機版排版優化) */}
+                <div className="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col lg:flex-row gap-4 lg:gap-6 lg:items-center justify-between">
+                  <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                    
+                    {/* 語系選擇 */}
+                    <div className="flex items-center justify-between sm:justify-start gap-2 bg-gray-50 sm:bg-transparent p-2 sm:p-0 rounded-lg border sm:border-0 border-gray-200">
+                      <label className="text-sm font-bold text-gray-700 whitespace-nowrap">顯示語系：</label>
                       <select 
                         value={previewLang} 
                         onChange={(e) => setPreviewLang(e.target.value)}
-                        className="border rounded px-3 py-1.5 bg-gray-50 outline-none focus:ring-2 focus:ring-[#6b584b]"
+                        className="border border-gray-300 rounded px-2 py-1.5 bg-white outline-none focus:ring-2 focus:ring-[#6b584b] text-sm flex-1 sm:flex-none font-medium"
                       >
                         <option value="zh-TW">繁體中文</option>
                         <option value="zh-CN">簡體中文</option>
                         <option value="en">English</option>
                       </select>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm font-bold text-gray-700">選擇報價幣值：</label>
-                      <div className="flex bg-gray-100 rounded p-1">
+
+                    {/* 幣值選擇 */}
+                    <div className="flex items-center justify-between sm:justify-start gap-2 bg-gray-50 sm:bg-transparent p-2 sm:p-0 rounded-lg border sm:border-0 border-gray-200">
+                      <label className="text-sm font-bold text-gray-700 whitespace-nowrap">報價幣值：</label>
+                      <div className="flex bg-gray-200 sm:bg-gray-100 rounded p-1 flex-1 sm:flex-none">
                         {['TWD', 'CNY', 'USD'].map((curr) => (
                           <button 
                             key={curr}
                             onClick={() => setPreviewCurrency(curr)}
-                            className={`px-3 py-1 rounded text-sm transition ${previewCurrency === curr ? 'bg-white shadow font-bold text-[#6b584b]' : 'text-gray-500'}`}
+                            className={`flex-1 sm:flex-none px-2 py-1 rounded text-[13px] sm:text-sm transition-colors ${previewCurrency === curr ? 'bg-white shadow font-bold text-[#6b584b]' : 'text-gray-500 hover:text-gray-700 font-medium'}`}
                           >
-                            {curr === 'TWD' ? '台幣 (TWD)' : curr === 'CNY' ? '人民幣 (RMB)' : '美金 (USD)'}
+                            {curr === 'TWD' ? '台幣' : curr === 'CNY' ? '人民幣' : '美金'}
                           </button>
                         ))}
                       </div>
@@ -882,7 +893,7 @@
                   <button 
                     onClick={downloadImage}
                     disabled={isExporting}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-bold transition-all shadow-md active:scale-95 disabled:opacity-50 ml-auto"
+                    className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 sm:py-2.5 rounded-lg font-bold transition-all shadow-md active:scale-95 disabled:opacity-50 w-full lg:w-auto mt-1 lg:mt-0"
                   >
                     <IconDownload />
                     {isExporting ? "匯出中..." : "下載報價單 (PNG)"}
