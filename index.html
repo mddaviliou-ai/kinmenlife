@@ -781,11 +781,11 @@
 
                           {/* 表格 */}
                           <div className="mb-8">
-                            {/* 加入 whitespace-nowrap 強制標題與幣別不換行 */}
+                            {/* 調整欄位比例：位置(2), 房間(3), 簡介(4), 價格(3) */}
                             <div className="grid grid-cols-12 border-b border-[#5c4a40]/20 pb-3 mb-4 text-sm font-bold opacity-80">
-                              <div className="col-span-3 text-center pr-2">{t.headerLoc}</div>
+                              <div className="col-span-2 text-left pr-2">{t.headerLoc}</div>
                               <div className="col-span-3 pr-2">{t.headerRoom}</div>
-                              <div className="col-span-3 pr-2">{t.headerType}</div>
+                              <div className="col-span-4 pr-2">{t.headerType}</div>
                               <div className="col-span-3 text-right whitespace-nowrap">
                                 {t.headerPrice}
                                 {previewCurrency === 'CNY' && <span className="text-[11px] font-normal opacity-80 tracking-normal ml-0.5">(人民币)</span>}
@@ -795,11 +795,11 @@
 
                             <div className="space-y-4">
                               {/* 古厝 */}
-                              <div className="grid grid-cols-12 items-start relative">
-                                <div className="col-span-3 text-center pt-6 font-bold opacity-80 px-2 leading-snug">{t.locOld}</div>
-                                <div className="col-span-9 space-y-4">
+                              <div className="grid grid-cols-12 items-center relative">
+                                <div className="col-span-2 text-left font-bold opacity-80 pr-2 leading-snug">{t.locOld}</div>
+                                <div className="col-span-10 space-y-4">
                                   {ROOMS_DATA.filter(r => r.loc === 'old').map(room => (
-                                    <div key={room.id} className="grid grid-cols-9 items-center">
+                                    <div key={room.id} className="grid grid-cols-10 items-center">
                                       <div className="col-span-3 font-medium text-[15px] pr-2 relative">
                                         {room.name[previewLang].startsWith('*') ? (
                                           <>
@@ -810,19 +810,21 @@
                                           room.name[previewLang]
                                         )}
                                       </div>
-                                      <div className="col-span-3 text-sm opacity-90 pr-2">{room.desc[previewLang]}</div>
+                                      <div className="col-span-4 text-sm opacity-90 pr-2">{room.desc[previewLang]}</div>
                                       <div className="col-span-3 text-right font-bold text-lg whitespace-nowrap">{getFinalRoomPrice(room)}</div>
                                     </div>
                                   ))}
                                 </div>
                               </div>
+                              
                               <div className="border-t border-dashed border-[#5c4a40]/30 my-6"></div>
+                              
                               {/* 新居 */}
-                              <div className="grid grid-cols-12 items-start">
-                                <div className="col-span-3 text-center pt-2 font-bold opacity-80 px-2 leading-snug">{t.locNew}</div>
-                                <div className="col-span-9 space-y-4">
+                              <div className="grid grid-cols-12 items-center">
+                                <div className="col-span-2 text-left font-bold opacity-80 pr-2 leading-snug">{t.locNew}</div>
+                                <div className="col-span-10 space-y-4">
                                   {ROOMS_DATA.filter(r => r.loc === 'new').map(room => (
-                                    <div key={room.id} className="grid grid-cols-9 items-center">
+                                    <div key={room.id} className="grid grid-cols-10 items-center">
                                       <div className="col-span-3 font-medium text-[15px] pr-2 relative">
                                         {room.name[previewLang].startsWith('*') ? (
                                           <>
@@ -833,7 +835,7 @@
                                           room.name[previewLang]
                                         )}
                                       </div>
-                                      <div className="col-span-3 text-sm opacity-90 pr-2">{room.desc[previewLang]}</div>
+                                      <div className="col-span-4 text-sm opacity-90 pr-2">{room.desc[previewLang]}</div>
                                       <div className="col-span-3 text-right font-bold text-lg whitespace-nowrap">{getFinalRoomPrice(room)}</div>
                                     </div>
                                   ))}
