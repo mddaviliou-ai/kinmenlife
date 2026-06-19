@@ -212,6 +212,9 @@
       // 7. 更新日期設定
       const [updateDate, setUpdateDate] = useLocalStorage('updateDate', '2026/06/19');
 
+      // 8. 備註行距設定
+      const [noteLineSpacing, setNoteLineSpacing] = useLocalStorage('noteLineSpacing', 1.8);
+
       // --- 圖片輸出狀態 ---
       const [isExporting, setIsExporting] = useState(false);
 
@@ -236,6 +239,7 @@
               if (data.customPricesUsd) setCustomPricesUsd(data.customPricesUsd);
               if (data.notes) setNotes(data.notes);
               if (data.updateDate) setUpdateDate(data.updateDate);
+              if (data.noteLineSpacing) setNoteLineSpacing(data.noteLineSpacing);
               
               // 載入同步的圖片 (如果雲端有資料的話)
               if (data.customLogo !== undefined) setCustomLogo(data.customLogo);
@@ -280,6 +284,7 @@
             customPricesUsd,
             notes,
             updateDate,
+            noteLineSpacing,
             customLogo, // 上傳已壓縮的 Logo
             customBg,   // 上傳已壓縮的 Background
             lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
@@ -397,13 +402,20 @@
         setNotes(newNotes);
       };
 
-      // 解析備註文字，將 {extra_fee} 替換為紅色粗體價格
+      // 解析備註文字，將 {extra_fee} 替換為紅色粗體價格，並判斷是否為附屬子項目(如括號開頭)來縮小行距
       const renderNoteWithVariable = (text, idx) => {
+        // 如果是以全形或半形括號開頭，將上方間距縮小
+        const isSubNote = /^[（(]/.test(text.trim());
+        const marginTop = idx === 0 ? '0' : (isSubNote ? `${noteLineSpacing * 0.1}rem` : `${noteLineSpacing * 0.4}rem`);
+
         const parts = text.split('{extra_fee}');
-        if (parts.length === 1) return <p key={idx}>{text}</p>;
+        
+        if (parts.length === 1) {
+          return <p key={idx} style={{ marginTop }}>{text}</p>;
+        }
         
         return (
-          <p key={idx}>
+          <p key={idx} style={{ marginTop }}>
             {parts.map((part, i) => (
               <Fragment key={i}>
                 {part}
@@ -673,6 +685,21 @@
                       <option value="en">編輯 English 備註</option>
                     </select>
                   </h2>
+
+                  {/* 新增：行距調整 */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-5 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                    <label className="text-sm font-bold text-gray-700 whitespace-nowrap">備註行距調整：</label>
+                    <input 
+                      type="range" 
+                      min="1.2" 
+                      max="3.0" 
+                      step="0.1" 
+                      value={noteLineSpacing} 
+                      onChange={(e) => setNoteLineSpacing(Number(e.target.value))}
+                      className="w-full sm:w-48 accent-[#6b584b]"
+                    />
+                    <span className="text-sm font-medium text-[#6b584b] w-8">{noteLineSpacing}</span>
+                  </div>
                   
                   <div className="bg-blue-50 text-blue-800 p-3 rounded-lg mb-4 text-sm flex gap-2 items-start">
                     <div className="mt-0.5 flex-shrink-0"><IconInfo /></div>
@@ -919,7 +946,7 @@
                           </div>
 
                           {/* 備註區 (動態渲染) */}
-                          <div className="text-[10px] sm:text-[13px] space-y-2 sm:space-y-3 opacity-80 leading-relaxed font-medium">
+                          <div className="text-[10px] sm:text-[13px] opacity-80 font-medium flex flex-col" style={{ lineHeight: noteLineSpacing }}>
                             {notes[previewLang].map((note, idx) => renderNoteWithVariable(note, idx))}
                           </div>
                         </div>
