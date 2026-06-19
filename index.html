@@ -137,25 +137,33 @@
 
     const STATIC_TRANSLATIONS = {
       'zh-TW': {
-        title: '民宿房價表', subtitle: '（附早餐、電動車體驗、機場/碼頭接送、代租車、寄放行李服務）',
+        title: '民宿房價表',
         headerLoc: '位置', headerRoom: '房間', headerType: '房型簡介', headerPrice: '每晚房價',
         locOld: '古厝', locNew: '新居',
         updated: '更新'
       },
       'zh-CN': {
-        title: '民宿房价表', subtitle: '（附早餐、电动车体验、机场/码头接送、代租车、寄放行李服务）',
+        title: '民宿房价表',
         headerLoc: '位置', headerRoom: '房间', headerType: '房型简介', headerPrice: '每晚房价',
         locOld: '古厝', locNew: '新居',
         updated: '更新'
       },
       'en': {
-        title: 'Homestay Room Rates', subtitle: '(Includes breakfast, e-bike experience, airport/pier transfer, car rental, luggage storage)',
+        title: 'Homestay Room Rates',
         headerLoc: 'Location', headerRoom: 'Room', headerType: 'Description', headerPrice: 'Rate / Night',
         locOld: 'Fujian-style old house', locNew: 'New House',
         updated: 'Updated'
       }
     };
 
+    // 預設副標題
+    const DEFAULT_SUBTITLES = {
+      'zh-TW': '（附早餐、電動車體驗、機場/碼頭接送、代租車、寄放行李服務）',
+      'zh-CN': '（附早餐、电动车体验、机场/码头接送、代租车、寄放行李服务）',
+      'en': '(Includes breakfast, e-bike experience, airport/pier transfer, car rental, luggage storage)'
+    };
+
+    // 預設備註
     const DEFAULT_NOTES = {
       'zh-TW': [
         '1. 部分房型可加床(標示*)，超過6歲須加床，每人酌收 {extra_fee} 。',
@@ -196,7 +204,8 @@
       const [customPricesCny, setCustomPricesCny] = useLocalStorage('customPricesCny', {}); 
       const [customPricesUsd, setCustomPricesUsd] = useLocalStorage('customPricesUsd', {}); 
       
-      // 4. 備註與預覽設定
+      // 4. 副標題與備註預覽設定
+      const [subtitles, setSubtitles] = useLocalStorage('subtitles', DEFAULT_SUBTITLES);
       const [notes, setNotes] = useLocalStorage('notes', DEFAULT_NOTES);
       const [editingNoteLang, setEditingNoteLang] = useLocalStorage('editingNoteLang', 'zh-TW');
       const [previewLang, setPreviewLang] = useLocalStorage('previewLang', 'zh-TW');
@@ -237,6 +246,7 @@
               if (data.basePricesTwd) setBasePricesTwd(data.basePricesTwd);
               if (data.customPricesCny) setCustomPricesCny(data.customPricesCny);
               if (data.customPricesUsd) setCustomPricesUsd(data.customPricesUsd);
+              if (data.subtitles) setSubtitles(data.subtitles);
               if (data.notes) setNotes(data.notes);
               if (data.updateDate) setUpdateDate(data.updateDate);
               if (data.noteLineSpacing) setNoteLineSpacing(data.noteLineSpacing);
@@ -282,6 +292,7 @@
             basePricesTwd,
             customPricesCny,
             customPricesUsd,
+            subtitles,
             notes,
             updateDate,
             noteLineSpacing,
@@ -383,7 +394,7 @@
         }
       };
 
-      // --- 備註操作邏輯 ---
+      // --- 備註與副標題操作邏輯 ---
       const handleNoteChange = (index, value) => {
         const newNotes = { ...notes };
         newNotes[editingNoteLang][index] = value;
@@ -400,6 +411,20 @@
         const newNotes = { ...notes };
         newNotes[editingNoteLang].splice(index, 1);
         setNotes(newNotes);
+      };
+
+      // 解析房間文字，自動為括號內的文字取消粗體
+      const renderRoomTextWithParenthesis = (text) => {
+        // 利用正規表達式切割括號區塊
+        const parts = text.split(/([\(（].*?[)）])/);
+        return parts.map((part, i) => {
+          if (/^[\(（].*[)）]$/.test(part)) {
+            // 括號內的文字：正常粗細、微透明
+            return <span key={i} className="font-normal opacity-80">{part}</span>;
+          }
+          // 括號外的文字：預設繼承外層的 font-bold
+          return <span key={i}>{part}</span>;
+        });
       };
 
       // 解析備註文字，將 {extra_fee} 替換為紅色粗體價格，並判斷是否為附屬子項目(如括號開頭)來縮小行距
@@ -675,18 +700,29 @@
                   </div>
                 </div>
 
-                {/* 4. 備註欄位編輯 */}
+                {/* 4. 副標題與備註欄位編輯 */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                   <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2 flex justify-between items-center">
-                    <span>4. 備註欄位編輯</span>
+                    <span>4. 副標題與備註編輯</span>
                     <select value={editingNoteLang} onChange={(e) => setEditingNoteLang(e.target.value)} className="text-sm font-normal border rounded px-2 py-1 outline-none">
-                      <option value="zh-TW">編輯 繁體中文 備註</option>
-                      <option value="zh-CN">編輯 簡體中文 備註</option>
-                      <option value="en">編輯 English 備註</option>
+                      <option value="zh-TW">編輯 繁體中文</option>
+                      <option value="zh-CN">編輯 簡體中文</option>
+                      <option value="en">編輯 English</option>
                     </select>
                   </h2>
 
-                  {/* 新增：行距調整 */}
+                  {/* 副標題編輯 */}
+                  <div className="mb-6 bg-orange-50/50 p-4 rounded-lg border border-orange-100">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">報價單副標題：</label>
+                    <input 
+                      type="text" 
+                      value={subtitles[editingNoteLang]} 
+                      onChange={(e) => setSubtitles({...subtitles, [editingNoteLang]: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-[#6b584b] outline-none"
+                    />
+                  </div>
+
+                  {/* 備註行距調整 */}
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-5 bg-gray-50 p-3 rounded-lg border border-gray-100">
                     <label className="text-sm font-bold text-gray-700 whitespace-nowrap">備註行距調整：</label>
                     <input 
@@ -876,7 +912,8 @@
                           {/* 標題 */}
                           <div className="mb-5 sm:mb-8">
                             <h1 className="text-2xl sm:text-3xl font-extrabold mb-2 sm:mb-3 tracking-wide">{t.title}</h1>
-                            <p className="text-[10px] sm:text-sm opacity-80 font-medium">{t.subtitle}</p>
+                            {/* 副標題設定為 font-bold 且可以從設定中編輯 */}
+                            <p className="text-[10px] sm:text-sm opacity-80 font-bold">{subtitles[previewLang]}</p>
                           </div>
 
                           {/* 表格 */}
@@ -900,17 +937,21 @@
                                 <div className="col-span-10 space-y-3 sm:space-y-4">
                                   {ROOMS_DATA.filter(r => r.loc === 'old').map(room => (
                                     <div key={room.id} className="grid grid-cols-10 items-center">
-                                      <div className="col-span-3 font-medium text-[11px] sm:text-[15px] pr-1 sm:pr-2 relative">
+                                      {/* 房型名稱：加粗，但用 renderRoomTextWithParenthesis 自動過濾括號內容 */}
+                                      <div className="col-span-3 font-bold text-[11px] sm:text-[15px] pr-1 sm:pr-2 relative">
                                         {room.name[previewLang].startsWith('*') ? (
                                           <>
-                                            <span className="absolute -left-2.5 sm:-left-3.5 opacity-80">*</span>
-                                            {room.name[previewLang].replace(/^\*\s*/, '')}
+                                            <span className="absolute -left-2.5 sm:-left-3.5 opacity-80 font-normal">*</span>
+                                            {renderRoomTextWithParenthesis(room.name[previewLang].replace(/^\*\s*/, ''))}
                                           </>
                                         ) : (
-                                          room.name[previewLang]
+                                          renderRoomTextWithParenthesis(room.name[previewLang])
                                         )}
                                       </div>
-                                      <div className="col-span-4 text-[10px] sm:text-sm opacity-90 pr-1 sm:pr-2 leading-snug">{room.desc[previewLang]}</div>
+                                      {/* 房間簡介：加粗，但用 renderRoomTextWithParenthesis 自動過濾括號內容 */}
+                                      <div className="col-span-4 font-bold text-[10px] sm:text-sm opacity-90 pr-1 sm:pr-2 leading-snug">
+                                        {renderRoomTextWithParenthesis(room.desc[previewLang])}
+                                      </div>
                                       <div className="col-span-3 text-right font-bold text-[13px] sm:text-lg whitespace-nowrap">{getFinalRoomPrice(room)}</div>
                                     </div>
                                   ))}
@@ -925,17 +966,19 @@
                                 <div className="col-span-10 space-y-3 sm:space-y-4">
                                   {ROOMS_DATA.filter(r => r.loc === 'new').map(room => (
                                     <div key={room.id} className="grid grid-cols-10 items-center">
-                                      <div className="col-span-3 font-medium text-[11px] sm:text-[15px] pr-1 sm:pr-2 relative">
+                                      <div className="col-span-3 font-bold text-[11px] sm:text-[15px] pr-1 sm:pr-2 relative">
                                         {room.name[previewLang].startsWith('*') ? (
                                           <>
-                                            <span className="absolute -left-2.5 sm:-left-3.5 opacity-80">*</span>
-                                            {room.name[previewLang].replace(/^\*\s*/, '')}
+                                            <span className="absolute -left-2.5 sm:-left-3.5 opacity-80 font-normal">*</span>
+                                            {renderRoomTextWithParenthesis(room.name[previewLang].replace(/^\*\s*/, ''))}
                                           </>
                                         ) : (
-                                          room.name[previewLang]
+                                          renderRoomTextWithParenthesis(room.name[previewLang])
                                         )}
                                       </div>
-                                      <div className="col-span-4 text-[10px] sm:text-sm opacity-90 pr-1 sm:pr-2 leading-snug">{room.desc[previewLang]}</div>
+                                      <div className="col-span-4 font-bold text-[10px] sm:text-sm opacity-90 pr-1 sm:pr-2 leading-snug">
+                                        {renderRoomTextWithParenthesis(room.desc[previewLang])}
+                                      </div>
                                       <div className="col-span-3 text-right font-bold text-[13px] sm:text-lg whitespace-nowrap">{getFinalRoomPrice(room)}</div>
                                     </div>
                                   ))}
