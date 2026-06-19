@@ -758,11 +758,16 @@
 
                           {/* 表格 */}
                           <div className="mb-8">
+                            {/* 加入 whitespace-nowrap 強制標題與幣別不換行 */}
                             <div className="grid grid-cols-12 border-b border-[#5c4a40]/20 pb-3 mb-4 text-sm font-bold opacity-80">
                               <div className="col-span-3 text-center pr-2">{t.headerLoc}</div>
                               <div className="col-span-3 pr-2">{t.headerRoom}</div>
                               <div className="col-span-3 pr-2">{t.headerType}</div>
-                              <div className="col-span-3 text-right">{t.headerPrice} {previewCurrency === 'CNY' ? '(人民币)' : previewCurrency === 'USD' ? '(USD)' : ''}</div>
+                              <div className="col-span-3 text-right whitespace-nowrap">
+                                {t.headerPrice}
+                                {previewCurrency === 'CNY' && <span className="text-[11px] font-normal opacity-80 tracking-normal ml-0.5">(人民币)</span>}
+                                {previewCurrency === 'USD' && <span className="text-[11px] font-normal opacity-80 tracking-normal ml-0.5">(USD)</span>}
+                              </div>
                             </div>
 
                             <div className="space-y-4">
@@ -783,7 +788,7 @@
                                         )}
                                       </div>
                                       <div className="col-span-3 text-sm opacity-90 pr-2">{room.desc[previewLang]}</div>
-                                      <div className="col-span-3 text-right font-bold text-lg">{getFinalRoomPrice(room)}</div>
+                                      <div className="col-span-3 text-right font-bold text-lg whitespace-nowrap">{getFinalRoomPrice(room)}</div>
                                     </div>
                                   ))}
                                 </div>
@@ -806,7 +811,7 @@
                                         )}
                                       </div>
                                       <div className="col-span-3 text-sm opacity-90 pr-2">{room.desc[previewLang]}</div>
-                                      <div className="col-span-3 text-right font-bold text-lg">{getFinalRoomPrice(room)}</div>
+                                      <div className="col-span-3 text-right font-bold text-lg whitespace-nowrap">{getFinalRoomPrice(room)}</div>
                                     </div>
                                   ))}
                                 </div>
