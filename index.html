@@ -233,6 +233,14 @@
       // 8. 備註行距設定
       const [noteLineSpacing, setNoteLineSpacing] = useLocalStorage('noteLineSpacing', 1.8);
 
+      // 9. 底部文字設定
+      const [bottomTextMain, setBottomTextMain] = useLocalStorage('bottomTextMain', '陳佳苑裡');
+      const [bottomTextSub, setBottomTextSub] = useLocalStorage('bottomTextSub', 'KINMEN');
+      const [showBottomText, setShowBottomText] = useLocalStorage('showBottomText', true);
+
+      // 10. Logo 大小設定
+      const [logoSize, setLogoSize] = useLocalStorage('logoSize', 48);
+
       // --- 圖片輸出狀態 ---
       const [isExporting, setIsExporting] = useState(false);
 
@@ -259,6 +267,11 @@
               if (data.noteLineSpacing) setNoteLineSpacing(data.noteLineSpacing);
               if (data.settingsPassword) setSettingsPassword(data.settingsPassword);
               
+              if (data.bottomTextMain !== undefined) setBottomTextMain(data.bottomTextMain);
+              if (data.bottomTextSub !== undefined) setBottomTextSub(data.bottomTextSub);
+              if (data.showBottomText !== undefined) setShowBottomText(data.showBottomText);
+              if (data.logoSize !== undefined) setLogoSize(data.logoSize);
+
               // 載入同步的圖片 (如果雲端有資料的話)
               if (data.customLogo !== undefined) setCustomLogo(data.customLogo);
               if (data.customBg !== undefined) setCustomBg(data.customBg);
@@ -305,6 +318,10 @@
             updateDate,
             noteLineSpacing,
             settingsPassword,
+            bottomTextMain,
+            bottomTextSub,
+            showBottomText,
+            logoSize, // 儲存 Logo 大小
             customLogo, // 上傳已壓縮的 Logo
             customBg,   // 上傳已壓縮的 Background
             lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
@@ -767,27 +784,67 @@
 
                 {/* 5. Logo 上傳 */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                  <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">5. 底部 Logo 設定</h2>
-                  <div className="flex flex-col sm:flex-row items-center gap-6">
-                    <div className="flex-1 w-full">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">上傳自訂 Logo 圖片 (預設讀取 logo3.png，建議為透明背景 PNG)</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoUpload}
-                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#6b584b] file:text-white hover:file:bg-[#524237] cursor-pointer border border-gray-200 rounded-md p-1"
-                      />
-                      {customLogo && customLogo !== 'logo3.png' && (
-                        <button onClick={() => { setCustomLogo('logo3.png'); setLogoError(false); }} className="mt-3 text-sm flex items-center gap-1 text-red-500 hover:text-red-700 font-medium">
-                          <IconTrash /> 移除自訂 Logo (恢復預設 logo3.png)
-                        </button>
-                      )}
+                  <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">5. 底部 Logo 與文字設定</h2>
+                  <div className="flex flex-col sm:flex-row items-start gap-6">
+                    <div className="flex-1 w-full space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">上傳自訂 Logo 圖片 (建議透明背景 PNG)</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoUpload}
+                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#6b584b] file:text-white hover:file:bg-[#524237] cursor-pointer border border-gray-200 rounded-md p-1"
+                        />
+                        {customLogo && customLogo !== 'logo3.png' && (
+                          <button onClick={() => { setCustomLogo('logo3.png'); setLogoError(false); }} className="mt-3 text-sm flex items-center gap-1 text-red-500 hover:text-red-700 font-medium">
+                            <IconTrash /> 移除自訂 Logo (恢復預設 logo3.png)
+                          </button>
+                        )}
+                      </div>
+                      
+                      <div className="border-t border-gray-100 pt-4">
+                        <label className="text-sm font-bold text-gray-700 mb-2 block">Logo 顯示大小調整：</label>
+                        <div className="flex items-center gap-4 mb-4">
+                          <input 
+                            type="range" 
+                            min="20" 
+                            max="150" 
+                            value={logoSize} 
+                            onChange={(e) => setLogoSize(Number(e.target.value))}
+                            className="w-full sm:w-64 accent-[#6b584b]"
+                          />
+                          <span className="text-sm font-medium text-[#6b584b]">{logoSize}px</span>
+                        </div>
+
+                        <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-3 cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            checked={showBottomText} 
+                            onChange={(e) => setShowBottomText(e.target.checked)}
+                            className="w-4 h-4 text-[#6b584b] focus:ring-[#6b584b] rounded"
+                          />
+                          顯示 Logo 旁邊的文字 (若您上傳的圖片已包含文字，可取消勾選)
+                        </label>
+                        
+                        {showBottomText && (
+                          <div className="flex gap-4">
+                            <div className="flex-1">
+                              <label className="block text-xs text-gray-500 mb-1">主標題</label>
+                              <input type="text" value={bottomTextMain} onChange={(e) => setBottomTextMain(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-1.5 focus:ring-2 focus:ring-[#6b584b] outline-none text-sm" />
+                            </div>
+                            <div className="flex-1">
+                              <label className="block text-xs text-gray-500 mb-1">副標題 (英文小字)</label>
+                              <input type="text" value={bottomTextSub} onChange={(e) => setBottomTextSub(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-1.5 focus:ring-2 focus:ring-[#6b584b] outline-none text-sm" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="w-32 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden shrink-0">
+                    <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-[#4a3f38] overflow-hidden shrink-0 mt-4 sm:mt-0 relative">
                       {customLogo && !logoError ? (
-                        <img src={customLogo} alt="Custom Logo Preview" className="max-w-full max-h-full object-contain p-2" onError={() => setLogoError(true)} />
+                        <img src={customLogo} alt="Custom Logo Preview" style={{ height: `${logoSize}px`, maxWidth: '100%', objectFit: 'contain' }} onError={() => setLogoError(true)} />
                       ) : (
-                        <span className="text-xs text-gray-400 text-center leading-tight">尚未加入圖片<br/>暫用純文字圖形</span>
+                        <span className="text-xs text-white/50 text-center leading-tight">尚未加入圖片</span>
                       )}
                     </div>
                   </div>
@@ -1014,14 +1071,19 @@
                     {/* 底部 Logo (直接疊加在外圍底圖上，如同原版海報) */}
                     <div className="absolute bottom-4 sm:bottom-8 left-0 right-0 flex items-center justify-center gap-2 sm:gap-3 text-white z-20 drop-shadow-md">
                       {customLogo && !logoError ? (
-                        <img src={customLogo} alt="Logo" className="max-h-8 sm:max-h-12 w-auto object-contain" onError={() => setLogoError(true)} />
+                        <img src={customLogo} alt="Logo" className="w-auto object-contain" style={{ height: `${logoSize}px` }} onError={() => setLogoError(true)} />
                       ) : (
                         <div className="w-8 h-8 sm:w-10 sm:h-10 border-2 border-white rounded-md flex items-center justify-center relative bg-[#524237]">
                           <div className="absolute top-1 w-3 sm:w-4 h-1 bg-white"></div>
                           <div className="absolute bottom-2 w-5 sm:w-6 h-2 sm:h-3 border border-white"></div>
                         </div>
                       )}
-                      <div className="font-bold text-lg sm:text-2xl tracking-widest">陳佳苑裡 <span className="text-[8px] sm:text-[10px] uppercase font-normal tracking-normal opacity-80">Kinmen</span></div>
+                      
+                      {showBottomText && (
+                        <div className="font-bold text-lg sm:text-2xl tracking-widest flex items-baseline gap-1.5">
+                          {bottomTextMain} <span className="text-[8px] sm:text-[10px] uppercase font-normal tracking-normal opacity-80">{bottomTextSub}</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* 右下角時間戳記 */}
