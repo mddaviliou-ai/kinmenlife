@@ -453,28 +453,58 @@
         });
       };
 
-      // 解析備註文字，將 {extra_fee} 替換為紅色粗體價格，並判斷是否為附屬子項目(如括號開頭)來縮小行距
+      // 解析備註文字，支援 {extra_fee}、**粗體**、!!紅色粗體!!，並判斷是否為附屬子項目縮小行距
       const renderNoteWithVariable = (text, idx) => {
         // 如果是以全形或半形括號開頭，將上方間距縮小
         const isSubNote = /^[（(]/.test(text.trim());
         const marginTop = idx === 0 ? '0' : (isSubNote ? `${noteLineSpacing * 0.1}rem` : `${noteLineSpacing * 0.4}rem`);
 
-        const parts = text.split('{extra_fee}');
-        
-        if (parts.length === 1) {
-          return <p key={idx} style={{ marginTop }}>{text}</p>;
-        }
+        // 使用正規表達式切割字串，保留標記符號以便判斷
+        const parts = text.split(/(\{extra_fee\}|\*\*.*?\*\*|!!.*?!!)/g);
         
         return (
           <p key={idx} style={{ marginTop }}>
-            {parts.map((part, i) => (
-              <Fragment key={i}>
-                {part}
-                {i < parts.length - 1 && (
-                  <span className="font-bold text-[#b44b3c]">{getExtraBedPrice()}</span>
-                )}
-              </Fragment>
-            ))}
+            {parts.map((part, i) => {
+              if (!part) return null;
+              
+              // 1. 替換加床費用
+              if (part === '{extra_fee}') {
+                return <span key={i} className="font-bold text-[#b44b3c]">{getExtraBedPrice()}</span>;
+              }
+              
+              // 2. 處理 **一般粗體** (並且支援裡面再包著 !!紅色!!)
+              if (part.startsWith('**') && part.endsWith('**')) {
+                const inner = part.slice(2, -2);
+                const innerParts = inner.split(/(!!.*?!!)/g);
+                return (
+                  <strong key={i} className="font-bold">
+                    {innerParts.map((ip, j) => (
+                      ip.startsWith('!!') && ip.endsWith('!!') 
+                        ? <span key={j} className="text-[#b44b3c]">{ip.slice(2, -2)}</span>
+                        : ip
+                    ))}
+                  </strong>
+                );
+              }
+              
+              // 3. 處理 !!紅色粗體!! (並且支援裡面再包著 **粗體**)
+              if (part.startsWith('!!') && part.endsWith('!!')) {
+                const inner = part.slice(2, -2);
+                const innerParts = inner.split(/(\*\*.*?\*\*)/g);
+                return (
+                  <span key={i} className="font-bold text-[#b44b3c]">
+                    {innerParts.map((ip, j) => (
+                      ip.startsWith('**') && ip.endsWith('**') 
+                        ? <span key={j}>{ip.slice(2, -2)}</span>
+                        : ip
+                    ))}
+                  </span>
+                );
+              }
+              
+              // 4. 一般純文字
+              return <Fragment key={i}>{part}</Fragment>;
+            })}
           </p>
         );
       };
@@ -749,10 +779,15 @@
                     <span className="text-sm font-medium text-[#6b584b] w-8">{noteLineSpacing}</span>
                   </div>
                   
-                  <div className="bg-blue-50 text-blue-800 p-3 rounded-lg mb-4 text-sm flex gap-2 items-start">
+                  <div className="bg-blue-50 text-blue-800 p-4 rounded-lg mb-5 text-sm flex gap-2 items-start border border-blue-100">
                     <div className="mt-0.5 flex-shrink-0"><IconInfo /></div>
-                    <div>
-                      <p><strong>小技巧：</strong>在文字中輸入 <code className="bg-white px-1 py-0.5 rounded border border-blue-200 mx-1">{'{extra_fee}'}</code> ，系統預覽時會自動將其替換為當前的「加床費用」並標示為紅色。</p>
+                    <div className="space-y-2 w-full">
+                      <p className="font-bold">文字排版小技巧：</p>
+                      <ul className="list-disc pl-4 space-y-1 opacity-90">
+                        <li>輸入 <code className="bg-white px-1 py-0.5 rounded border border-blue-200">**文字**</code> 可將文字變成<strong>一般粗體</strong> (例：**8.5折優惠**)</li>
+                        <li>輸入 <code className="bg-white px-1 py-0.5 rounded border border-blue-200">!!文字!!</code> 可將文字變成<span className="font-bold text-[#b44b3c]">紅色粗體</span> (例：!!注意事項!!)</li>
+                        <li>輸入 <code className="bg-white px-1 py-0.5 rounded border border-blue-200">{'{extra_fee}'}</code> 會自動替換為計算後的<span className="font-bold text-[#b44b3c]">紅色加床費用</span></li>
+                      </ul>
                     </div>
                   </div>
 
